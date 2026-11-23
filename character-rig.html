@@ -19,37 +19,78 @@
   .sheet { background:#fff; border-radius:14px; box-shadow:0 6px 24px rgba(0,0,0,.12); overflow:hidden; }
   .sheet svg { display:block; width:100%; height:auto; }
   svg [data-pivot] { transform-box: view-box; }
-  .animate #head { animation: nod 2.4s ease-in-out infinite; }
-  .animate #arm-left { animation: swingL 2.4s ease-in-out infinite; }
-  .animate #arm-right { animation: swingR 2.4s ease-in-out infinite; }
-  .animate #eye-left, .animate #eye-right { animation: blink 3.2s infinite; transform-box: fill-box; transform-origin: center; }
-  @keyframes nod { 50% { transform: rotate(-5deg); } }
-  @keyframes swingL { 50% { transform: rotate(8deg); } }
-  @keyframes swingR { 50% { transform: rotate(-8deg); } }
-  @keyframes blink { 0%, 92%, 100% { transform: scaleY(1); } 96% { transform: scaleY(.1); } }
+  /* blink runs in every mode */
+  .sheet.on #eye-left, .sheet.on #eye-right { animation: blink 3.2s infinite; }
+  @keyframes blink { 0%, 92%, 100% { transform: scaleY(1); } 96% { transform: scaleY(.08); } }
+
+  /* walk in place: body bobs, feet lift in turn, arms swing opposite */
+  .walk #figure { animation: bob .9s ease-in-out infinite; }
+  .walk #floor-shadow { animation: shadow .9s ease-in-out infinite; }
+  .walk #foot-left { animation: stepL .9s ease-in-out infinite; }
+  .walk #foot-right { animation: stepR .9s ease-in-out infinite; }
+  .walk #arm-left { animation: swingA .9s ease-in-out infinite; }
+  .walk #arm-right { animation: swingB .9s ease-in-out infinite; }
+  .walk #head { animation: headWalk .9s ease-in-out infinite; }
+  @keyframes bob { 0%, 50%, 100% { transform: translateY(0); } 25%, 75% { transform: translateY(-3px); } }
+  @keyframes shadow { 0%, 50%, 100% { transform: scaleX(1); } 25%, 75% { transform: scaleX(.94); } }
+  @keyframes stepL { 0%, 50%, 100% { transform: translateY(0) rotate(0); } 25% { transform: translateY(-9px) rotate(-6deg); } }
+  @keyframes stepR { 0%, 50%, 100% { transform: translateY(0) rotate(0); } 75% { transform: translateY(-9px) rotate(6deg); } }
+  @keyframes swingA { 0%, 100% { transform: rotate(-7deg); } 50% { transform: rotate(7deg); } }
+  @keyframes swingB { 0%, 100% { transform: rotate(-7deg); } 50% { transform: rotate(7deg); } }
+  @keyframes headWalk { 0%, 50%, 100% { transform: rotate(0); } 25% { transform: rotate(1.5deg); } 75% { transform: rotate(-1.5deg); } }
+
+  /* talk: mouth opens and closes, brows lift, head nods a little */
+  .talk #mouth-open { animation: talk 1.1s steps(1, end) infinite; }
+  .talk #mouth-smile { animation: smileOff 1.1s steps(1, end) infinite; }
+  .talk #brow-left, .talk #brow-right { animation: brows 2.2s ease-in-out infinite; }
+  .talk:not(.walk):not(.wave) #head { animation: talkNod 2.2s ease-in-out infinite; }
+  @keyframes talk {
+    0% { opacity: 1; transform: scaleY(.55); } 12% { opacity: 1; transform: scaleY(1); }
+    24% { opacity: 1; transform: scaleY(.3); } 36% { opacity: 1; transform: scaleY(.8); }
+    48% { opacity: 0; } 60% { opacity: 1; transform: scaleY(.65); }
+    72% { opacity: 1; transform: scaleY(1); } 84% { opacity: 1; transform: scaleY(.4); } 100% { opacity: 0; } }
+  @keyframes smileOff { 0%, 36% { opacity: 0; } 48% { opacity: 1; } 60%, 84% { opacity: 0; } 100% { opacity: 1; } }
+  @keyframes brows { 0%, 100% { transform: translateY(0); } 30% { transform: translateY(-1.6px); } 60% { transform: translateY(0); } }
+  @keyframes talkNod { 0%, 100% { transform: rotate(0); } 25% { transform: rotate(-2.5deg); } 70% { transform: rotate(2deg); } }
+
+  /* wave: raise the right-hand arm and wave the hand (declared last so it wins) */
+  .wave #arm-right { animation: raise 1.4s ease-in-out infinite alternate; }
+  .wave #hand-right { animation: wrist .35s ease-in-out infinite alternate; }
+  .wave:not(.walk) #head { animation: waveHead 1.4s ease-in-out infinite alternate; }
+  @keyframes raise { 0% { transform: rotate(-140deg); } 100% { transform: rotate(-154deg); } }
+  @keyframes wrist { 0% { transform: rotate(-14deg); } 100% { transform: rotate(14deg); } }
+  @keyframes waveHead { 0% { transform: rotate(3deg); } 100% { transform: rotate(5deg); } }
+  .btns { display:flex; flex-wrap:wrap; gap:8px; }
+  .btns button { background:transparent; color:var(--ink); border:1.5px solid var(--accent); }
+  .btns button[aria-pressed="true"] { background:var(--accent); color:#fff; }
 </style>
 </head>
 <body>
 <main>
   <h1>الشخصية — أجزاء منفصلة قابلة للتحريك</h1>
-  <p>كل عضو مجموعة مستقلة لها نقطة ارتكاز: الرأس، العينان، الحاجبان، الشعر، الطاقية، الأذنان، الذراعان، اليدان، القدمان، الجسم.</p>
+  <p>اضغط على حركة لتشغيلها أو إيقافها، ويمكن الجمع بينها (مثلًا: مشي وكلام معًا).</p>
   <div class="controls">
     <label><input type="checkbox" id="showRef"> إظهار الصورة الأصلية</label>
     <label>شفافية الرسم <input type="range" id="vecOp" min="0" max="100" value="100"></label>
-    <label><input type="checkbox" id="anim"> تحريك تجريبي</label>
+    <div class="btns" role="group" aria-label="الحركات">
+      <button type="button" data-move="wave" aria-pressed="false">تلويح</button>
+      <button type="button" data-move="talk" aria-pressed="false">كلام</button>
+      <button type="button" data-move="walk" aria-pressed="false">مشي في المكان</button>
+    </div>
     <button id="dl">تنزيل ملف SVG</button>
   </div>
   <div class="sheet">
-<svg id="art" xmlns="http://www.w3.org/2000/svg" viewBox="700 40 222 476" role="img" aria-label="ولد بطاقية زرقاء وثوب برتقالي واقف">
+<svg id="art" xmlns="http://www.w3.org/2000/svg" viewBox="690 14 262 502" role="img" aria-label="ولد بطاقية زرقاء وثوب برتقالي واقف">
 <image id="ref" href="reference.jpg" x="0" y="0" width="1024" height="559" style="display:none"/>
-<rect id="paper" x="700" y="40" width="222" height="476" fill="#fefefd"/>
+<rect id="paper" x="690" y="14" width="262" height="502" fill="#fefefd"/>
 <g id="character">
-<g id="floor-shadow"><ellipse cx="807.99" cy="501.25" rx="100.12" ry="10.25" fill="#f0dfd7"/></g>
-<g id="foot-left">
+<g id="floor-shadow" data-pivot="808.0,501.3"><ellipse cx="807.99" cy="501.25" rx="100.12" ry="10.25" fill="#f0dfd7"/></g>
+<g id="figure">
+<g id="foot-left" data-pivot="760.7,499.8">
 <path id="foot-left-skin" fill="#ea9a70" d="M757.02,470.36C761.91,470.21 777.92,473.81 782.24,474.76C786.55,475.72 782.67,474.20 782.92,476.08C783.16,477.96 783.69,483.72 783.70,486.05C783.72,488.37 785.68,488.32 783.00,490.00C780.33,491.69 772.66,494.49 767.64,496.14C762.63,497.79 755.97,499.33 752.92,499.91C749.87,500.50 750.55,500.01 749.33,499.67C748.12,499.32 746.89,498.09 745.63,497.85C744.37,497.61 743.36,498.46 741.76,498.23C740.16,498.00 737.53,497.06 736.03,496.47C734.54,495.88 733.44,495.30 732.80,494.70C732.16,494.10 732.10,493.55 732.21,492.88C732.31,492.21 731.93,491.87 733.43,490.68C734.94,489.49 738.77,487.47 741.24,485.74C743.71,484.00 746.32,481.95 748.27,480.27C750.22,478.59 751.46,477.32 752.92,475.67C754.38,474.02 752.14,470.51 757.02,470.36Z"/>
 <path id="sandal-left" fill="#8a3d2c" d="M743.01,463.22C750.99,463.06 782.54,463.04 790.65,463.10C798.76,463.16 791.42,463.29 791.68,463.57C791.93,463.86 792.10,463.22 792.18,464.82C792.26,466.41 792.24,471.60 792.15,473.15C792.06,474.70 791.91,473.91 791.63,474.13C791.35,474.35 792.11,474.50 790.47,474.46C788.84,474.43 786.59,474.57 781.82,473.93C777.05,473.30 768.11,472.14 761.85,470.65C755.60,469.15 747.48,466.05 744.30,464.95C741.12,463.86 742.97,464.36 742.76,464.08C742.54,463.79 735.03,463.38 743.01,463.22ZM781.64,490.96C784.11,490.17 782.60,491.13 782.76,491.44C782.92,491.76 783.13,492.25 782.60,492.85C782.06,493.46 782.32,493.95 779.57,495.07C776.82,496.19 770.44,498.31 766.08,499.58C761.72,500.85 756.64,502.16 753.43,502.68C750.21,503.20 748.88,502.89 746.80,502.70C744.71,502.52 742.99,502.14 740.92,501.58C738.85,501.02 735.78,499.97 734.39,499.36C733.00,498.75 733.02,498.39 732.61,497.89C732.19,497.40 731.99,496.82 731.92,496.41C731.84,495.99 732.00,495.63 732.16,495.43C732.33,495.23 732.08,494.93 732.91,495.21C733.74,495.49 735.48,496.54 737.13,497.12C738.77,497.71 741.25,498.44 742.76,498.74C744.26,499.04 744.98,498.71 746.15,498.91C747.33,499.11 748.51,499.78 749.80,499.95C751.10,500.11 750.91,500.56 753.93,499.93C756.95,499.30 763.31,497.68 767.93,496.18C772.55,494.69 779.17,491.75 781.64,490.96Z"/>
 </g>
-<g id="foot-right">
+<g id="foot-right" data-pivot="854.5,499.8">
 <path id="foot-right-skin" fill="#eb9a70" d="M856.87,470.49C858.60,470.17 857.53,470.21 858.30,470.97C859.06,471.73 859.43,473.04 861.44,475.06C863.45,477.09 866.96,480.50 870.37,483.13C873.78,485.76 879.78,489.27 881.92,490.83C884.05,492.40 883.01,491.96 883.17,492.51C883.32,493.06 883.68,493.47 882.85,494.12C882.03,494.77 879.35,495.96 878.22,496.39C877.09,496.83 876.87,496.38 876.07,496.73C875.28,497.07 874.23,498.18 873.47,498.46C872.72,498.75 872.15,498.71 871.53,498.44C870.92,498.17 870.52,496.64 869.79,496.83C869.05,497.03 868.18,499.09 867.11,499.61C866.03,500.12 866.50,500.45 863.33,499.92C860.16,499.38 852.38,497.66 848.09,496.41C843.81,495.15 840.13,493.45 837.62,492.38C835.11,491.31 833.95,490.67 833.03,489.97C832.11,489.26 832.27,489.27 832.10,488.15C831.93,487.03 831.83,485.42 832.00,483.25C832.18,481.09 830.51,476.89 833.16,475.16C835.81,473.44 843.94,473.67 847.89,472.89C851.84,472.11 855.13,470.81 856.87,470.49Z"/>
 <path id="sandal-right" fill="#8a3d2c" d="M825.20,463.20C832.77,462.90 861.85,463.01 869.50,463.00C877.14,463.00 870.71,463.04 871.07,463.16C871.43,463.28 871.83,463.42 871.67,463.74C871.51,464.06 873.62,463.72 870.09,465.09C866.55,466.45 855.22,470.51 850.45,471.95C845.67,473.38 845.39,473.22 841.44,473.69C837.49,474.15 829.52,474.62 826.75,474.74C823.98,474.87 825.27,474.69 824.82,474.43C824.38,474.17 824.20,474.77 824.08,473.17C823.95,471.57 823.88,466.48 824.07,464.82C824.25,463.15 817.63,463.50 825.20,463.20ZM832.74,490.81C833.01,490.64 831.21,489.86 833.90,490.87C836.60,491.87 843.89,495.28 848.92,496.83C853.95,498.38 861.07,499.63 864.09,500.16C867.11,500.70 866.12,500.31 867.03,500.03C867.95,499.76 868.77,498.70 869.56,498.52C870.35,498.34 871.05,498.92 871.77,498.94C872.49,498.95 872.10,499.28 873.88,498.63C875.66,497.97 880.86,495.58 882.43,495.01C884.00,494.43 883.11,495.03 883.29,495.18C883.47,495.32 883.74,495.33 883.49,495.89C883.24,496.45 882.74,497.73 881.77,498.52C880.80,499.31 879.54,499.96 877.65,500.65C875.77,501.35 872.84,502.32 870.45,502.70C868.06,503.08 866.09,503.22 863.32,502.93C860.55,502.64 858.17,502.16 853.81,500.94C849.45,499.72 840.61,496.89 837.14,495.61C833.67,494.33 833.80,493.89 832.98,493.27C832.17,492.65 832.29,492.30 832.24,491.89C832.20,491.48 832.46,490.98 832.74,490.81Z"/>
 </g>
@@ -103,7 +144,10 @@
 <ellipse cx="832" cy="142.5" rx="8.5" ry="5.5" fill="#e88565" opacity=".55"/>
 </g>
 <path id="nose" fill="#d97c5a" d="M800.42,136.48C800.93,136.02 800.99,136.43 801.15,136.62C801.30,136.81 801.59,137.08 801.33,137.62C801.08,138.16 799.97,139.28 799.63,139.88C799.29,140.48 799.08,140.59 799.31,141.23C799.54,141.87 800.42,143.23 801.03,143.72C801.65,144.21 802.28,144.13 803.02,144.17C803.76,144.21 804.51,144.08 805.45,143.95C806.38,143.82 807.83,143.60 808.63,143.38C809.43,143.17 809.85,142.66 810.24,142.65C810.64,142.63 810.94,143.02 811.00,143.31C811.07,143.59 810.76,144.13 810.63,144.36C810.50,144.58 810.49,144.68 810.23,144.65C809.98,144.62 809.57,144.14 809.10,144.18C808.63,144.23 807.76,144.68 807.41,144.90C807.06,145.12 807.00,145.22 807.00,145.49C806.99,145.76 807.51,146.28 807.38,146.53C807.25,146.77 806.80,146.90 806.22,146.97C805.63,147.03 804.41,147.07 803.87,146.91C803.34,146.74 803.32,146.19 802.99,145.98C802.67,145.76 802.31,145.56 801.91,145.64C801.52,145.73 801.14,146.50 800.63,146.50C800.13,146.49 799.27,145.92 798.88,145.62C798.48,145.33 798.28,145.00 798.25,144.71C798.22,144.41 798.81,144.16 798.69,143.87C798.57,143.58 797.76,143.40 797.54,142.94C797.32,142.48 797.29,141.71 797.38,141.12C797.48,140.52 797.61,140.14 798.12,139.37C798.63,138.60 799.92,136.94 800.42,136.48Z"/>
-<path id="mouth" fill="#b25a3c" d="M816.58,150.39C817.32,150.18 817.02,150.43 817.03,150.56C817.04,150.68 817.25,150.76 816.63,151.14C816.02,151.51 814.97,152.30 813.32,152.82C811.66,153.33 808.84,153.98 806.71,154.21C804.58,154.44 802.10,154.31 800.54,154.21C798.98,154.12 798.24,153.89 797.36,153.64C796.47,153.40 795.49,152.95 795.26,152.77C795.03,152.59 794.89,152.47 795.97,152.55C797.06,152.63 799.84,153.18 801.75,153.25C803.67,153.32 805.66,153.20 807.46,152.96C809.27,152.73 811.07,152.26 812.59,151.84C814.11,151.41 815.84,150.61 816.58,150.39Z"/>
+<g id="mouth">
+<path id="mouth-smile" fill="#b25a3c" d="M816.58,150.39C817.32,150.18 817.02,150.43 817.03,150.56C817.04,150.68 817.25,150.76 816.63,151.14C816.02,151.51 814.97,152.30 813.32,152.82C811.66,153.33 808.84,153.98 806.71,154.21C804.58,154.44 802.10,154.31 800.54,154.21C798.98,154.12 798.24,153.89 797.36,153.64C796.47,153.40 795.49,152.95 795.26,152.77C795.03,152.59 794.89,152.47 795.97,152.55C797.06,152.63 799.84,153.18 801.75,153.25C803.67,153.32 805.66,153.20 807.46,152.96C809.27,152.73 811.07,152.26 812.59,151.84C814.11,151.41 815.84,150.61 816.58,150.39Z"/>
+<g id="mouth-open" data-pivot="805.5,148.6" opacity="0"><path d="M793.2,148.6 C798.5,151.2 812.5,151 818.6,147.2 C817,155.6 811.6,160.4 805.6,160.4 C799.2,160.4 794.4,156 793.2,148.6 Z" fill="#8c2f2a"/><path d="M795.6,150 C800.5,152 811.5,151.8 816.4,149 L815.8,151.6 C810.5,153.8 801,153.9 796.4,152.2 Z" fill="#fbf4ee"/><path d="M799.6,158.2 C802.5,155.6 809,155.4 812,157.8 C809.8,159.8 807.6,160.3 805.6,160.3 C803.4,160.3 801.3,159.7 799.6,158.2 Z" fill="#e2685a"/></g>
+</g>
 <g id="eye-left" data-pivot="783.6,129.2">
 <clipPath id="eye-left-clip"><ellipse cx="783.6" cy="129.2" rx="10.6" ry="8.3"/></clipPath>
 <ellipse id="eye-left-white" cx="783.6" cy="129.2" rx="10.6" ry="8.3" fill="#f7f5f2"/>
@@ -131,6 +175,7 @@
 </g>
 </g>
 </g>
+</g>
 </svg>
   </div>
 </main>
@@ -146,9 +191,18 @@
     ref.style.display = on ? '' : 'none';
     paper.style.display = on ? 'none' : '';
     vec.style.opacity = document.getElementById('vecOp').value / 100;
-    document.querySelector('.sheet').classList.toggle('animate', document.getElementById('anim').checked);
   }
-  ['showRef', 'vecOp', 'anim'].forEach(function (id) {
+  // each move can be switched on alone or combined with the others
+  var sheet = document.querySelector('.sheet');
+  document.querySelectorAll('[data-move]').forEach(function (b) {
+    b.addEventListener('click', function () {
+      var on = b.getAttribute('aria-pressed') !== 'true';
+      b.setAttribute('aria-pressed', on);
+      sheet.classList.toggle(b.dataset.move, on);
+      sheet.classList.toggle('on', !!document.querySelector('[data-move][aria-pressed="true"]'));
+    });
+  });
+  ['showRef', 'vecOp'].forEach(function (id) {
     document.getElementById(id).addEventListener('input', sync);
     document.getElementById(id).addEventListener('change', sync);
   });

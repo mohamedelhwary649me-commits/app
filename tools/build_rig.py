@@ -225,14 +225,15 @@ ys, xs = np.nonzero(fl)
 cx, cy = xs.mean(), ys.mean()
 rx = (np.percentile(xs, 99.5) - np.percentile(xs, 0.5)) / 2
 ry = (np.percentile(ys, 99.5) - np.percentile(ys, 0.5)) / 2
-svg.append(f'<g id="floor-shadow"><ellipse cx="{X0 + cx / S:.2f}" cy="{Y0 + cy / S:.2f}" rx="{rx / S:.2f}" ry="{ry / S:.2f}" fill="{colour(fl)}"/></g>')
+svg.append(f'<g id="floor-shadow" data-pivot="{X0 + cx / S:.1f},{Y0 + cy / S:.1f}"><ellipse cx="{X0 + cx / S:.2f}" cy="{Y0 + cy / S:.2f}" rx="{rx / S:.2f}" ry="{ry / S:.2f}" fill="{colour(fl)}"/></g>')
 
 # ---------------------------------------------------------------- feet
 for side, zone in (("left", foot_L), ("right", foot_R)):
     sk = keep(fg & zone & C("skin", "skinsh", "white", "floor") & ~C("floor") | (fg & zone & C("skin", "skinsh")), largest=True)
     sk = fill_holes(sk)
     sd = keep(fg & zone & C("sandal", "robedark", "mouth", "robesh"), min_area=200)
-    svg.append(f'<g id="foot-{side}">')
+    fy, fx = np.nonzero(sk)
+    svg.append(f'<g id="foot-{side}" data-pivot="{X0 + fx.mean() / S:.1f},{Y0 + fy.max() / S:.1f}">')
     el(f"foot-{side}-skin", path(sk, 4, 5, 1.6), colour(sk, "skin"))
     el(f"sandal-{side}", path(sd, 3, 4, 1.4), "#8a3d2c")
     svg.append("</g>")
@@ -330,7 +331,15 @@ for cx_, cy_ in ((779.5, 143.5), (832, 142.5)):
 svg.append("</g>")
 el("nose", path(keep(face & nose_z & C("skinsh", "mouth"), min_area=10), 2, 3, 1.0, 10), "#d97c5a")
 el("nose-tip", path(keep(face & nose_z & C("white"), min_area=4), 1, 1, 0.6, 4), "#fbe0cf")
-el("mouth", path(keep(face & mouth_z & C("mouth", "robedark", "robesh"), largest=True), 2, 2.5, 0.8, 10), "#b25a3c")
+svg.append('<g id="mouth">')
+el("mouth-smile", path(keep(face & mouth_z & C("mouth", "robedark", "robesh"), largest=True), 2, 2.5, 0.8, 10), "#b25a3c")
+# open mouth used while talking (hidden at rest); scales open from its top edge
+svg.append('<g id="mouth-open" data-pivot="805.5,148.6" opacity="0">'
+           '<path d="M793.2,148.6 C798.5,151.2 812.5,151 818.6,147.2 C817,155.6 811.6,160.4 805.6,160.4 C799.2,160.4 794.4,156 793.2,148.6 Z" fill="#8c2f2a"/>'
+           '<path d="M795.6,150 C800.5,152 811.5,151.8 816.4,149 L815.8,151.6 C810.5,153.8 801,153.9 796.4,152.2 Z" fill="#fbf4ee"/>'
+           '<path d="M799.6,158.2 C802.5,155.6 809,155.4 812,157.8 C809.8,159.8 807.6,160.3 805.6,160.3 C803.4,160.3 801.3,159.7 799.6,158.2 Z" fill="#e2685a"/>'
+           '</g>')
+svg.append('</g>')
 # eyes: measured on the reference at 6x (white = ellipse, iris = circle,
 # shine = small circle, lid = one smooth arc) - clean shapes that blink well
 EYES = {"left": dict(c=(783.6, 129.2), r=(10.6, 8.3), iris=(785.2, 131.0, 6.6), shine=(781.0, 128.4, 1.9)),
@@ -384,7 +393,9 @@ def block(start):
     return svg[i:j]
 order = ['<g id="floor-shadow"', '<g id="foot-left"', '<g id="foot-right"', '<g id="body"',
          '<g id="arm-left"', '<g id="arm-right"', '<g id="head"']
-final = [l for o in order for l in block(o)]
+blocks = [block(o) for o in order]
+# everything except the floor shadow moves together (walk bob)
+final = blocks[0] + ['<g id="figure">'] + [l for b in blocks[1:] for l in b] + ['</g>']
 art = "\n".join(final)
 
 html = f"""<!doctype html>
@@ -408,30 +419,70 @@ html = f"""<!doctype html>
   .sheet {{ background:#fff; border-radius:14px; box-shadow:0 6px 24px rgba(0,0,0,.12); overflow:hidden; }}
   .sheet svg {{ display:block; width:100%; height:auto; }}
   svg [data-pivot] {{ transform-box: view-box; }}
-  .animate #head {{ animation: nod 2.4s ease-in-out infinite; }}
-  .animate #arm-left {{ animation: swingL 2.4s ease-in-out infinite; }}
-  .animate #arm-right {{ animation: swingR 2.4s ease-in-out infinite; }}
-  .animate #eye-left, .animate #eye-right {{ animation: blink 3.2s infinite; transform-box: fill-box; transform-origin: center; }}
-  @keyframes nod {{ 50% {{ transform: rotate(-5deg); }} }}
-  @keyframes swingL {{ 50% {{ transform: rotate(8deg); }} }}
-  @keyframes swingR {{ 50% {{ transform: rotate(-8deg); }} }}
-  @keyframes blink {{ 0%, 92%, 100% {{ transform: scaleY(1); }} 96% {{ transform: scaleY(.1); }} }}
+  /* blink runs in every mode */
+  .sheet.on #eye-left, .sheet.on #eye-right {{ animation: blink 3.2s infinite; }}
+  @keyframes blink {{ 0%, 92%, 100% {{ transform: scaleY(1); }} 96% {{ transform: scaleY(.08); }} }}
+
+  /* walk in place: body bobs, feet lift in turn, arms swing opposite */
+  .walk #figure {{ animation: bob .9s ease-in-out infinite; }}
+  .walk #floor-shadow {{ animation: shadow .9s ease-in-out infinite; }}
+  .walk #foot-left {{ animation: stepL .9s ease-in-out infinite; }}
+  .walk #foot-right {{ animation: stepR .9s ease-in-out infinite; }}
+  .walk #arm-left {{ animation: swingA .9s ease-in-out infinite; }}
+  .walk #arm-right {{ animation: swingB .9s ease-in-out infinite; }}
+  .walk #head {{ animation: headWalk .9s ease-in-out infinite; }}
+  @keyframes bob {{ 0%, 50%, 100% {{ transform: translateY(0); }} 25%, 75% {{ transform: translateY(-3px); }} }}
+  @keyframes shadow {{ 0%, 50%, 100% {{ transform: scaleX(1); }} 25%, 75% {{ transform: scaleX(.94); }} }}
+  @keyframes stepL {{ 0%, 50%, 100% {{ transform: translateY(0) rotate(0); }} 25% {{ transform: translateY(-9px) rotate(-6deg); }} }}
+  @keyframes stepR {{ 0%, 50%, 100% {{ transform: translateY(0) rotate(0); }} 75% {{ transform: translateY(-9px) rotate(6deg); }} }}
+  @keyframes swingA {{ 0%, 100% {{ transform: rotate(-7deg); }} 50% {{ transform: rotate(7deg); }} }}
+  @keyframes swingB {{ 0%, 100% {{ transform: rotate(-7deg); }} 50% {{ transform: rotate(7deg); }} }}
+  @keyframes headWalk {{ 0%, 50%, 100% {{ transform: rotate(0); }} 25% {{ transform: rotate(1.5deg); }} 75% {{ transform: rotate(-1.5deg); }} }}
+
+  /* talk: mouth opens and closes, brows lift, head nods a little */
+  .talk #mouth-open {{ animation: talk 1.1s steps(1, end) infinite; }}
+  .talk #mouth-smile {{ animation: smileOff 1.1s steps(1, end) infinite; }}
+  .talk #brow-left, .talk #brow-right {{ animation: brows 2.2s ease-in-out infinite; }}
+  .talk:not(.walk):not(.wave) #head {{ animation: talkNod 2.2s ease-in-out infinite; }}
+  @keyframes talk {{
+    0% {{ opacity: 1; transform: scaleY(.55); }} 12% {{ opacity: 1; transform: scaleY(1); }}
+    24% {{ opacity: 1; transform: scaleY(.3); }} 36% {{ opacity: 1; transform: scaleY(.8); }}
+    48% {{ opacity: 0; }} 60% {{ opacity: 1; transform: scaleY(.65); }}
+    72% {{ opacity: 1; transform: scaleY(1); }} 84% {{ opacity: 1; transform: scaleY(.4); }} 100% {{ opacity: 0; }} }}
+  @keyframes smileOff {{ 0%, 36% {{ opacity: 0; }} 48% {{ opacity: 1; }} 60%, 84% {{ opacity: 0; }} 100% {{ opacity: 1; }} }}
+  @keyframes brows {{ 0%, 100% {{ transform: translateY(0); }} 30% {{ transform: translateY(-1.6px); }} 60% {{ transform: translateY(0); }} }}
+  @keyframes talkNod {{ 0%, 100% {{ transform: rotate(0); }} 25% {{ transform: rotate(-2.5deg); }} 70% {{ transform: rotate(2deg); }} }}
+
+  /* wave: raise the right-hand arm and wave the hand (declared last so it wins) */
+  .wave #arm-right {{ animation: raise 1.4s ease-in-out infinite alternate; }}
+  .wave #hand-right {{ animation: wrist .35s ease-in-out infinite alternate; }}
+  .wave:not(.walk) #head {{ animation: waveHead 1.4s ease-in-out infinite alternate; }}
+  @keyframes raise {{ 0% {{ transform: rotate(-140deg); }} 100% {{ transform: rotate(-154deg); }} }}
+  @keyframes wrist {{ 0% {{ transform: rotate(-14deg); }} 100% {{ transform: rotate(14deg); }} }}
+  @keyframes waveHead {{ 0% {{ transform: rotate(3deg); }} 100% {{ transform: rotate(5deg); }} }}
+  .btns {{ display:flex; flex-wrap:wrap; gap:8px; }}
+  .btns button {{ background:transparent; color:var(--ink); border:1.5px solid var(--accent); }}
+  .btns button[aria-pressed="true"] {{ background:var(--accent); color:#fff; }}
 </style>
 </head>
 <body>
 <main>
   <h1>الشخصية — أجزاء منفصلة قابلة للتحريك</h1>
-  <p>كل عضو مجموعة مستقلة لها نقطة ارتكاز: الرأس، العينان، الحاجبان، الشعر، الطاقية، الأذنان، الذراعان، اليدان، القدمان، الجسم.</p>
+  <p>اضغط على حركة لتشغيلها أو إيقافها، ويمكن الجمع بينها (مثلًا: مشي وكلام معًا).</p>
   <div class="controls">
     <label><input type="checkbox" id="showRef"> إظهار الصورة الأصلية</label>
     <label>شفافية الرسم <input type="range" id="vecOp" min="0" max="100" value="100"></label>
-    <label><input type="checkbox" id="anim"> تحريك تجريبي</label>
+    <div class="btns" role="group" aria-label="الحركات">
+      <button type="button" data-move="wave" aria-pressed="false">تلويح</button>
+      <button type="button" data-move="talk" aria-pressed="false">كلام</button>
+      <button type="button" data-move="walk" aria-pressed="false">مشي في المكان</button>
+    </div>
     <button id="dl">تنزيل ملف SVG</button>
   </div>
   <div class="sheet">
-<svg id="art" xmlns="http://www.w3.org/2000/svg" viewBox="700 40 222 476" role="img" aria-label="ولد بطاقية زرقاء وثوب برتقالي واقف">
+<svg id="art" xmlns="http://www.w3.org/2000/svg" viewBox="690 14 262 502" role="img" aria-label="ولد بطاقية زرقاء وثوب برتقالي واقف">
 <image id="ref" href="reference.jpg" x="0" y="0" width="1024" height="559" style="display:none"/>
-<rect id="paper" x="700" y="40" width="222" height="476" fill="#fefefd"/>
+<rect id="paper" x="690" y="14" width="262" height="502" fill="#fefefd"/>
 <g id="character">
 {art}
 </g>
@@ -450,9 +501,18 @@ html = f"""<!doctype html>
     ref.style.display = on ? '' : 'none';
     paper.style.display = on ? 'none' : '';
     vec.style.opacity = document.getElementById('vecOp').value / 100;
-    document.querySelector('.sheet').classList.toggle('animate', document.getElementById('anim').checked);
   }}
-  ['showRef', 'vecOp', 'anim'].forEach(function (id) {{
+  // each move can be switched on alone or combined with the others
+  var sheet = document.querySelector('.sheet');
+  document.querySelectorAll('[data-move]').forEach(function (b) {{
+    b.addEventListener('click', function () {{
+      var on = b.getAttribute('aria-pressed') !== 'true';
+      b.setAttribute('aria-pressed', on);
+      sheet.classList.toggle(b.dataset.move, on);
+      sheet.classList.toggle('on', !!document.querySelector('[data-move][aria-pressed="true"]'));
+    }});
+  }});
+  ['showRef', 'vecOp'].forEach(function (id) {{
     document.getElementById(id).addEventListener('input', sync);
     document.getElementById(id).addEventListener('change', sync);
   }});
