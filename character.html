@@ -1,0 +1,208 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ورقة الشخصية</title>
+<style>
+  :root { --bg: #efe9df; --card: #fdfaf5; --ink: #3a2a1e; --accent: #c8642c; }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) { --bg: #1d1a17; --card: #fdfaf5; --ink: #f1e6d8; --accent: #e07a3e; }
+  }
+  :root[data-theme="dark"] { --bg: #1d1a17; --card: #fdfaf5; --ink: #f1e6d8; --accent: #e07a3e; }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--ink); font-family: "Segoe UI", Tahoma, sans-serif; }
+  main { max-width: 1100px; margin: 0 auto; padding: 24px 16px 40px; }
+  h1 { font-size: 1.4rem; margin: 0 0 16px; }
+  .sheet { background: var(--card); border-radius: 14px; box-shadow: 0 6px 24px rgba(0,0,0,.12); overflow: hidden; }
+  .sheet svg { display: block; width: 100%; height: auto; }
+  button { margin-top: 16px; font: inherit; padding: 10px 18px; border: 0; border-radius: 8px; background: var(--accent); color: #fff; cursor: pointer; }
+</style>
+</head>
+<body>
+<main>
+  <h1>ورقة تعابير الشخصية — رسم فيكتور (SVG)</h1>
+  <div class="sheet">
+<svg id="art" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 559" role="img" aria-label="ولد بطاقية زرقاء وثوب برتقالي بست تعابير ووقفة كاملة">
+  <defs>
+    <radialGradient id="paper" cx="50%" cy="45%" r="75%">
+      <stop offset="0" stop-color="#fffdf9"/>
+      <stop offset="1" stop-color="#f3ede3"/>
+    </radialGradient>
+    <linearGradient id="robe" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#b9572a"/>
+      <stop offset=".45" stop-color="#cf6a34"/>
+      <stop offset="1" stop-color="#b65428"/>
+    </linearGradient>
+    <linearGradient id="capG" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#86b4c6"/>
+      <stop offset="1" stop-color="#6c9cb0"/>
+    </linearGradient>
+
+    <!-- open eye -->
+    <g id="eye">
+      <ellipse rx="9" ry="10.5" fill="#fff"/>
+      <circle cx="0" cy="1" r="6.8" fill="#4a2c18"/>
+      <circle cx="0" cy="1" r="3.6" fill="#1c120b"/>
+      <circle cx="2.4" cy="-2" r="2.2" fill="#fff"/>
+      <path d="M-10,-4 Q0,-14 10,-4" fill="none" stroke="#1f1712" stroke-width="2.6" stroke-linecap="round"/>
+    </g>
+
+    <!-- cap embroidery band -->
+    <g id="capBand">
+      <path d="M-51,-31 C-30,-23 30,-23 51,-31 L50,-40 C30,-32 -30,-32 -50,-40Z" fill="#5d8da1"/>
+      <path d="M-46,-34 l5,-3 5,3 5,-3 5,3 5,-3 5,3 5,-3 5,3 5,-3 5,3 5,-3 5,3 5,-3 5,3 5,-3 5,3 5,-3 5,3" fill="none" stroke="#a9cbd8" stroke-width="1.3" transform="translate(0,1)"/>
+    </g>
+
+    <!-- head: back hair, ears, face, fringe, cap -->
+    <g id="head">
+      <ellipse cx="0" cy="-8" rx="58" ry="52" fill="#1d2433"/>
+      <ellipse cx="-50" cy="14" rx="10" ry="14" fill="#e3a074"/>
+      <ellipse cx="-50" cy="14" rx="5" ry="8" fill="#cf855a"/>
+      <ellipse cx="50" cy="14" rx="10" ry="14" fill="#e3a074"/>
+      <ellipse cx="50" cy="14" rx="5" ry="8" fill="#cf855a"/>
+      <path d="M-47,-12 C-50,30 -28,58 0,60 C28,58 50,30 47,-12 C40,-40 -40,-40 -47,-12Z" fill="#eaab7f"/>
+      <path d="M-47,-12 C-50,30 -28,58 0,60 C-20,52 -38,32 -40,0Z" fill="#dc9a6e" opacity=".55"/>
+      <ellipse cx="-29" cy="26" rx="9" ry="5.5" fill="#ef7f6e" opacity=".55"/>
+      <ellipse cx="29" cy="26" rx="9" ry="5.5" fill="#ef7f6e" opacity=".55"/>
+      <path d="M-56,-24 C-59,0 -54,12 -49,18 L-45,-2 L-39,6 L-32,-14 L-22,-3 L-13,-19 L-3,-6 L6,-21 L15,-6 L25,-18 L32,-3 L40,-14 L45,4 L49,-2 C55,10 58,-2 57,-24 C50,-46 -50,-46 -56,-24Z" fill="#1d2433"/>
+      <path d="M-30,-20 L-24,-8 M8,-22 L12,-10 M28,-20 L32,-8" stroke="#34405a" stroke-width="2" stroke-linecap="round"/>
+      <path d="M-51,-31 C-49,-74 49,-74 51,-31 C30,-23 -30,-23 -51,-31Z" fill="url(#capG)"/>
+      <path d="M-20,-62 C-10,-66 10,-66 20,-62" fill="none" stroke="#a9cbd8" stroke-width="1.5" opacity=".7"/>
+      <use href="#capBand"/>
+      <path d="M-4,22 Q0,25 4,22" fill="none" stroke="#c97f55" stroke-width="2" stroke-linecap="round"/>
+    </g>
+
+    <!-- bust: neck + robe with collar -->
+    <g id="bust">
+      <path d="M-15,44 L-15,74 L15,74 L15,44Z" fill="#d48d62"/>
+      <path d="M-78,118 C-74,86 -46,72 -22,68 L22,68 C46,72 74,86 78,118Z" fill="url(#robe)"/>
+      <path d="M-24,66 C-10,76 10,76 24,66 L24,74 C10,84 -10,84 -24,74Z" fill="#a84c22"/>
+      <path d="M-20,71 C-8,79 8,79 20,71" fill="none" stroke="#e8b36a" stroke-width="1.6" stroke-dasharray="3 2"/>
+      <path d="M-7,78 L7,78 L7,118 L-7,118Z" fill="#b5522a"/>
+      <path d="M-4,82 L4,90 L-4,98 L4,106 L-4,114" fill="none" stroke="#e8b36a" stroke-width="1.6"/>
+      <path d="M-66,100 C-50,94 -34,92 -20,96 M66,100 C50,94 34,92 20,96" fill="none" stroke="#a84c22" stroke-width="1.5" opacity=".6"/>
+    </g>
+  </defs>
+
+  <rect width="1024" height="559" fill="url(#paper)"/>
+
+  <!-- 1. laughing -->
+  <g transform="translate(195,138)">
+    <use href="#bust"/><use href="#head"/>
+    <path d="M-30,8 Q-20,-2 -10,8 M10,8 Q20,-2 30,8" fill="none" stroke="#1f1712" stroke-width="3.2" stroke-linecap="round"/>
+    <path d="M-30,-6 Q-20,-13 -10,-8 M10,-8 Q20,-13 30,-6" fill="none" stroke="#1d2433" stroke-width="3.5" stroke-linecap="round"/>
+    <path d="M-22,31 Q0,30 22,31 Q18,54 0,54 Q-18,54 -22,31Z" fill="#7a1f1c"/>
+    <path d="M-20,32 Q0,31 20,32 L18,38 Q0,37 -18,38Z" fill="#fff"/>
+    <path d="M-11,48 Q0,42 11,48 Q6,54 0,54 Q-6,54 -11,48Z" fill="#e66a5e"/>
+  </g>
+
+  <!-- 2. thinking with book -->
+  <g transform="translate(393,138)">
+    <use href="#bust"/>
+    <g transform="rotate(-4)"><use href="#head"/>
+      <g transform="translate(-20,6)"><use href="#eye"/><circle cx="3" cy="-3" r="4" fill="#4a2c18"/><circle cx="4" cy="-4" r="1.6" fill="#fff"/></g>
+      <g transform="translate(20,6)"><use href="#eye"/><circle cx="3" cy="-3" r="4" fill="#4a2c18"/><circle cx="4" cy="-4" r="1.6" fill="#fff"/></g>
+      <path d="M-31,-10 Q-22,-16 -10,-8 M10,-8 Q22,-16 31,-12" fill="none" stroke="#1d2433" stroke-width="3.5" stroke-linecap="round"/>
+      <path d="M-6,38 Q2,35 9,38" fill="none" stroke="#8a3b2a" stroke-width="2.6" stroke-linecap="round"/>
+    </g>
+    <!-- hand on chin -->
+    <path d="M-4,56 C4,50 16,52 18,60 L20,84 L4,88 C-2,80 -6,66 -4,56Z" fill="#e3a074"/>
+    <path d="M-2,58 C6,52 14,54 15,60" fill="none" stroke="#c97f55" stroke-width="2"/>
+    <!-- book -->
+    <g transform="translate(-20,104) rotate(-14)">
+      <rect x="-58" y="-24" width="116" height="48" rx="4" fill="#2f8a8c"/>
+      <rect x="-56" y="-22" width="112" height="44" rx="3" fill="#3aa1a1"/>
+      <path d="M0,-22 L0,22" stroke="#1f6b6e" stroke-width="3"/>
+      <path d="M-48,-16 Q-30,-6 -10,-14" fill="none" stroke="#e8c36a" stroke-width="2"/>
+      <text x="28" y="6" font-size="17" font-weight="700" fill="#fff6dc" text-anchor="middle" font-family="Tahoma, sans-serif">قصص</text>
+      <text x="-28" y="12" font-size="12" font-weight="700" fill="#fff6dc" text-anchor="middle" font-family="Tahoma, sans-serif">الأنبياء</text>
+    </g>
+    <path d="M-62,92 C-54,84 -42,86 -40,96 L-44,110 L-60,108Z" fill="#e3a074"/>
+  </g>
+
+  <!-- 3. surprised -->
+  <g transform="translate(580,138)">
+    <use href="#bust"/><use href="#head"/>
+    <g transform="translate(-20,8) scale(1.15)"><use href="#eye"/></g>
+    <g transform="translate(20,8) scale(1.15)"><use href="#eye"/></g>
+    <path d="M-31,-12 Q-20,-20 -9,-14 M9,-14 Q20,-20 31,-12" fill="none" stroke="#1d2433" stroke-width="3.5" stroke-linecap="round"/>
+    <ellipse cx="0" cy="40" rx="6" ry="7.5" fill="#7a1f1c"/>
+    <ellipse cx="0" cy="43" rx="3.5" ry="3" fill="#e66a5e"/>
+  </g>
+
+  <!-- 4. calm, eyes closed -->
+  <g transform="translate(195,375)">
+    <use href="#bust"/><use href="#head"/>
+    <path d="M-30,8 Q-20,15 -10,8 M10,8 Q20,15 30,8" fill="none" stroke="#1f1712" stroke-width="3" stroke-linecap="round"/>
+    <path d="M-30,-4 Q-20,-9 -10,-5 M10,-5 Q20,-9 30,-4" fill="none" stroke="#1d2433" stroke-width="3.5" stroke-linecap="round"/>
+    <path d="M-10,36 Q0,43 10,36" fill="none" stroke="#8a3b2a" stroke-width="2.6" stroke-linecap="round"/>
+  </g>
+
+  <!-- 5. angry / determined -->
+  <g transform="translate(393,375)">
+    <use href="#bust"/><use href="#head"/>
+    <g transform="translate(-20,9)"><use href="#eye"/></g>
+    <g transform="translate(20,9)"><use href="#eye"/></g>
+    <path d="M-32,-8 L-9,1 M9,1 L32,-8" stroke="#1d2433" stroke-width="4.5" stroke-linecap="round"/>
+    <path d="M-10,41 Q0,35 10,41" fill="none" stroke="#8a3b2a" stroke-width="2.6" stroke-linecap="round"/>
+  </g>
+
+  <!-- 6. wink -->
+  <g transform="translate(580,375)">
+    <use href="#bust"/><use href="#head"/>
+    <g transform="translate(-20,8)"><use href="#eye"/></g>
+    <path d="M10,9 Q20,3 30,9 M28,9 l5,-3" fill="none" stroke="#1f1712" stroke-width="3" stroke-linecap="round"/>
+    <path d="M-31,-12 Q-20,-19 -9,-11 M10,-3 Q20,-1 31,-6" fill="none" stroke="#1d2433" stroke-width="3.5" stroke-linecap="round"/>
+    <path d="M-8,38 Q4,44 14,34" fill="none" stroke="#8a3b2a" stroke-width="2.6" stroke-linecap="round"/>
+  </g>
+
+  <!-- full body -->
+  <ellipse cx="810" cy="500" rx="100" ry="10" fill="#e9dfd2"/>
+  <g transform="translate(810,0)">
+    <!-- feet -->
+    <path d="M-32,478 C-44,478 -48,494 -34,496 L-12,496 C-6,494 -8,480 -14,478Z" fill="#e3a074"/>
+    <path d="M32,478 C44,478 48,494 34,496 L12,496 C6,494 8,480 14,478Z" fill="#e3a074"/>
+    <path d="M-48,496 L-6,496 M6,496 L48,496" stroke="#7a4a2a" stroke-width="4" stroke-linecap="round"/>
+    <path d="M-34,484 L-20,484 M20,484 L34,484" stroke="#7a4a2a" stroke-width="3" stroke-linecap="round"/>
+    <!-- robe -->
+    <path d="M-50,182 C-40,170 -20,166 0,166 C20,166 40,170 50,182 L58,300 L64,482 L-64,482 L-58,300Z" fill="url(#robe)"/>
+    <path d="M-20,200 C-24,300 -30,400 -34,480 M18,210 C22,320 26,400 28,480" fill="none" stroke="#a84c22" stroke-width="2" opacity=".5"/>
+    <!-- sleeves & hands -->
+    <path d="M-50,182 C-62,190 -70,250 -74,326 L-54,330 C-52,280 -50,240 -44,210Z" fill="#c45f2f"/>
+    <path d="M50,182 C62,190 70,250 74,326 L54,330 C52,280 50,240 44,210Z" fill="#c45f2f"/>
+    <path d="M-74,318 L-54,322 M54,322 L74,318" stroke="#e8b36a" stroke-width="2.4" stroke-dasharray="3 2"/>
+    <path d="M-74,328 C-78,346 -70,360 -62,356 C-56,352 -54,340 -54,330Z" fill="#e3a074"/>
+    <path d="M74,328 C78,346 70,360 62,356 C56,352 54,340 54,330Z" fill="#e3a074"/>
+    <!-- collar & placket -->
+    <path d="M-18,160 L-18,176 L18,176 L18,160Z" fill="#d48d62"/>
+    <path d="M-20,170 C-8,180 8,180 20,170 L20,178 C8,188 -8,188 -20,178Z" fill="#a84c22"/>
+    <path d="M-16,175 C-6,182 6,182 16,175" fill="none" stroke="#e8b36a" stroke-width="1.4" stroke-dasharray="3 2"/>
+    <path d="M-6,182 L6,182 L6,240 L-6,240Z" fill="#b5522a"/>
+    <path d="M-3,186 L3,193 L-3,200 L3,207 L-3,214 L3,221 L-3,228 L3,235" fill="none" stroke="#e8b36a" stroke-width="1.4"/>
+    <!-- head -->
+    <g transform="translate(0,105) scale(0.82)">
+      <use href="#head"/>
+      <g transform="translate(-20,8)"><use href="#eye"/></g>
+      <g transform="translate(20,8)"><use href="#eye"/></g>
+      <path d="M-30,-6 Q-20,-12 -10,-7 M10,-7 Q20,-12 30,-6" fill="none" stroke="#1d2433" stroke-width="3.5" stroke-linecap="round"/>
+      <path d="M-11,35 Q0,43 11,35" fill="none" stroke="#8a3b2a" stroke-width="2.8" stroke-linecap="round"/>
+    </g>
+  </g>
+</svg>
+  </div>
+  <button id="dl">تنزيل ملف SVG</button>
+</main>
+<script>
+  document.getElementById('dl').addEventListener('click', function () {
+    var svg = document.getElementById('art').outerHTML;
+    var blob = new Blob([svg], { type: 'image/svg+xml' });
+    var a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = 'character-sheet.svg';
+    a.click();
+    URL.revokeObjectURL(a.href);
+  });
+</script>
+</body>
+</html>
